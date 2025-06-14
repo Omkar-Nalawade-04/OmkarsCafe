@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Place Order - Omkar's Cafe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .item-row {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+{% include 'navbar.html' %}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Place Your Order</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ... HEAD remains unchanged ... -->
+
+<form method="POST" action="{{ url_for('order') }}">
+    <div class="mb-3">
+        <label for="name" class="form-label">Full Name</label>
+        <input type="text" name="name" id="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="contact" class="form-label">Contact Number</label>
+        <input type="text" name="contact" id="contact" class="form-control" required>
+        
+    </div>
+
+    <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <textarea name="address" id="address" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <h5 class="mb-3">Select Items</h5>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-6">
+            <div class="item-row">
+                <div class="form-check mb-2">
+                    <input class="form-check-input item-check" type="checkbox"
+                           id="check_{{ product.id }}"
+                           name="selected_items[]"
+                           value="{{ product.name }}"
+                           data-price="{{ product.price }}"
+                           data-id="{{ product.id }}">
+                    <label class="form-check-label fw-bold" for="check_{{ product.id }}">
+                        {{ product.name }} - ₹{{ product.price }}
+                    </label>
+                </div>
+                <p>{{ product.description }}</p>
+                <label for="qty_{{ product.id }}">Quantity:</label>
+                <input type="number" class="form-control qty-input"
+                       name="quantity_{{ product.name }}"
+                       id="qty_{{ product.id }}"
+                       min="1" value="1" disabled>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+        <h4>Grand Total: ₹<span id="grandTotal">0.00</span></h4>
+        <input type="hidden" name="total_price" id="total_price_hidden">
+        <button type="submit" class="btn btn-primary mt-3">Place Order</button>
+    </div>
+</form>
+
+<script>
+    const checkboxes = document.querySelectorAll('.item-check');
+    const grandTotal = document.getElementById('grandTotal');
+    const totalPriceHidden = document.getElementById('total_price_hidden');
+
+    function updateTotal() {
+        let total = 0;
+        checkboxes.forEach((checkbox) => {
+            const id = checkbox.dataset.id;
+            const qtyInput = document.getElementById(`qty_${id}`);
+            if (checkbox.checked) {
+                qtyInput.disabled = false;
+                const price = parseFloat(checkbox.dataset.price);
+                const quantity = parseInt(qtyInput.value) || 0;
+                total += price * quantity;
+            } else {
+                qtyInput.disabled = true;
+            }
+        });
+        grandTotal.innerText = total.toFixed(2);
+        totalPriceHidden.value = total.toFixed(2);
+    }
+
+    checkboxes.forEach((checkbox) => {
+        const id = checkbox.dataset.id;
+        const qtyInput = document.getElementById(`qty_${id}`);
+        checkbox.addEventListener('change', updateTotal);
+        qtyInput.addEventListener('input', updateTotal);
+    });
+
+    updateTotal();  // Initialize on page load
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

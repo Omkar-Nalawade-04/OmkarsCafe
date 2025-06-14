@@ -1,0 +1,43 @@
+/* General Layout */
+body {
+    background-color: #f9f9f9;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Flash message */
+.alert {
+    font-size: 0.95rem;
+    margin-top: 15px;
+}
+
+/* Form card styling */
+.container form {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.06);
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    font-weight: 600;
+}
+
+@media (max-width: 576px) {
+    .item-row {
+      padding: 10px;
+    }
+  }
+  
+
+  @media (min-width: 577px) and (max-width: 992px) {
+    .item-row {
+      padding: 20px;
+    }
+  }
+  
